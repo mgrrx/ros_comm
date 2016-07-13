@@ -7,26 +7,9 @@
 #include <errno.h>
 #include <sys/timeb.h>
 #include <sys/poll.h>
-#if defined (__ANDROID__)
-#include <sys/select.h>
-#endif
 
-#if defined(_WINDOWS)
-# include <winsock2.h>
-static inline int poll( struct pollfd *pfd, int nfds, int timeout)
-{
-    return WSAPoll ( pfd, nfds, timeout );
-}
-
-# define USE_FTIME
-# if defined(_MSC_VER)
-#  define timeb _timeb
-#  define ftime _ftime_s
-# endif
-#else
-# include <sys/time.h>
-#endif  // _WINDOWS
-
+#define USE_FTIME
+#include <sys/time.h>
 
 using namespace XmlRpc;
 

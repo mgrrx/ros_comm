@@ -54,8 +54,14 @@ XmlRpcServerConnection::~XmlRpcServerConnection()
 // and reading the rpc request. Return true to continue to monitor
 // the socket for events, false to remove it from the dispatcher.
 unsigned
-XmlRpcServerConnection::handleEvent(unsigned /*eventType*/)
+XmlRpcServerConnection::handleEvent(unsigned eventType)
 {
+  if (eventType == XmlRpcDispatch::Exception)
+    return 0;
+  // if there are no bytes available for read and we got a read event, the client wants to close the connection
+  if (eventType == XmlRpcDispatch::ReadableEvent && XmlRpcSocket::bytesAvailableForRead(this->getfd()) == 0)
+    return 0;
+
   if (_connectionState == READ_HEADER)
     if ( ! readHeader()) return 0;
 
@@ -66,7 +72,7 @@ XmlRpcServerConnection::handleEvent(unsigned /*eventType*/)
     if ( ! writeResponse()) return 0;
 
   return (_connectionState == WRITE_RESPONSE) 
-        ? XmlRpcDispatch::WritableEvent : XmlRpcDispatch::ReadableEvent;
+        ? XmlRpcDispatch::WritableEvent | XmlRpcDispatch::ReadableEvent | XmlRpcDispatch::Exception : XmlRpcDispatch::ReadableEvent | XmlRpcDispatch::Exception;
 }
 
 

@@ -39,6 +39,7 @@
 extern "C" {
 # include <unistd.h>
 # include <stdio.h>
+# include <sys/ioctl.h>
 # include <sys/types.h>
 # include <sys/socket.h>
 # include <netinet/in.h>
@@ -385,5 +386,12 @@ int XmlRpcSocket::get_port(int socket)
       return ntohs(sin6->sin6_port);
   }  
   return 0;
+}
+
+int XmlRpcSocket::bytesAvailableForRead(int socket)
+{
+    int bytes;
+    ioctl(socket, FIONREAD, &bytes);
+    return bytes;
 }
 

@@ -59,7 +59,7 @@ namespace XmlRpc {
     //! Accept a client connection request
     static int accept(int socket);
 
-
+    static int bytesAvailableForRead(int socket);
 
     //! Connect a socket to a server (from a client)
     static bool connect(int socket, std::string& host, int port);
